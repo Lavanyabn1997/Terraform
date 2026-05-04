@@ -1,1 +1,207 @@
-# Terraform
+Terraform 
+It is an open-source tool by HashiCorp used for Infrastructure as Code (IaC).
+Instead of manually setting up servers, networks, and cloud services,
+you define your infrastructure in configuration files, 
+Terraform automatically provisions and manages it.
+Define infrastructure in code (using HCL – HashiCorp Configuration Language)
+
+Key Features
+
+Infrastructure as Code (IaC) - You write declarative configuration files to describe your desired infrastructure state.
+Multi-Cloud Support - Terraform works across multiple providers, so you’re not locked into one cloud.
+Execution Plan - Before making changes, Terraform shows a preview (terraform plan) of what will happen.
+State Management - It keeps track of your infrastructure state in a state file.
+Modular Architecture - Reusable modules help organize and scale infrastructure.
+Dependency Graph - Terraform automatically understands dependencies between resources and applies them in the correct order.
+
+Advantages
+
+Automation & Efficiency - Reduces manual setup and human error.
+Consistency - Same configuration = same infrastructure every time.
+Version Control - You can store Terraform code in Git and track changes.
+Multi-Cloud Flexibility - Manage different providers in one tool.
+Scalable & Reusable - Modules allow reuse across projects.
+
+Disadvantages
+
+State File Complexity - Managing the Terraform state file can be tricky, especially in teams.
+Learning Curve - HCL and Terraform concepts may take time to understand for beginners.
+Limited Real-Time Awareness - Terraform doesn’t automatically detect changes made outside of it (called “drift”) unless you run commands.
+Debugging Can Be Hard - Errors can sometimes be unclear or difficult to troubleshoot.
+Not Ideal for Configuration Management - Terraform is for provisioning infrastructure, not configuring software inside servers (tools like Ansible or Puppet are better for that).
+
+Declarative Vs Imperative Approaches
+
+| **Feature**          | **Declarative Approach**                                                                   | **Imperative Approach**                                                        |
+| -------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| **Philosophy**       | Specifies the desired state (the "what") of the infrastructure.                            | Details the exact steps or commands (the "how") to achieve the desired state.  |
+| **Execution**        | The IaC tool determines and performs the actions needed to reach the desired state.        | Requires the user to execute commands in the correct sequence.                 |
+| **State Management** | The tool tracks the current state of the infrastructure, simplifying updates and teardown. | Does not inherently track state; the user is responsible for managing changes. |
+| **User Focus**       | Simplifies the process; users define what they want.                                       | Demands detailed instructions; the user defines how to achieve the result.     |
+| **Handling Changes** | Automatically calculates and applies the necessary changes to match the new desired state. | The user must write a new script to figure out and apply the changes manually. |
+| **Example**          | Terraform config: `                                                                        |                                                                                |
+
+Terraform vs AWS CloudFormation
+
+| **Feature**  | **Terraform**                                                                            | **AWS CloudFormation**                                 |
+| ------------ | ---------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| **Scope**    | Multi-cloud (supports Amazon Web Services, Microsoft Azure, Google Cloud Platform, etc.) | AWS only (tightly integrated with Amazon Web Services) |
+| **Language** | HCL (HashiCorp Configuration Language – simple, clean, easy to read)                     | JSON or YAML (can become verbose and complex)          |
+| **State**    | Managed by user (local or remote state management)                                       | Managed automatically by Amazon Web Services           |
+
+Terraform vs Ansible
+
+| **Feature**       | **Terraform**                                                                                         | **Ansible**                                                                               |
+| ----------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| **Primary Use**   | Focuses on setting up and managing infrastructure.                                                    | Primarily used for configuring systems and deploying applications.                        |
+| **Language**      | Uses HCL for infrastructure definitions.                                                              | Uses YAML for defining tasks.                                                             |
+| **Stability**     | Automatically ensures resources are created only if necessary (idempotent infrastructure management). | Requires careful task definition to avoid duplication in execution.                       |
+| **Execution**     | Manages infrastructure changes using execution plans and state tracking.                              | Executes tasks immediately without persistent state tracking.                             |
+| **Cloud Support** | Excellent multi-cloud capabilities (AWS, Azure, GCP, etc.).                                           | Supports multi-cloud environments but mainly focused on system-level configuration tasks. |
+
+Terraform Work Flow:
+
+1. Write Configuration (Define Infrastructure)
+You create .tf files using HCL (HashiCorp Configuration Language)
+You define what infrastructure you want
+
+Example:
+
+EC2 instance
+Virtual network
+Database
+
+👉 This is the desired state
+
+2. Initialize Terraform
+terraform init
+
+What happens:
+
+Downloads required providers (e.g., Amazon Web Services, Microsoft Azure)
+Sets up backend configuration (state storage)
+Prepares working directory
+
+3. Plan the Changes
+terraform plan
+
+What happens:
+
+Compares current state vs desired state
+Creates an execution plan
+Shows:
+What will be created
+What will be changed
+What will be deleted
+
+👉 Safe preview step (no changes applied)
+
+4. Apply the Changes
+terraform apply
+
+What happens:
+
+Executes the plan
+Calls cloud provider APIs
+Creates/updates/deletes resources
+Updates the state file
+5. State Management
+Terraform maintains a state file (terraform.tfstate)
+Tracks real infrastructure
+Helps detect drift (manual changes outside Terraform)
+6. Destroy Infrastructure (Optional)
+terraform destroy
+
+What happens:
+
+Deletes all resources defined in configuration
+Cleans up infrastructure completely
+🔁 Terraform Workflow Diagram
+Write Code (.tf files)
+        ↓
+terraform init
+        ↓
+terraform plan
+        ↓
+terraform apply
+        ↓
+Cloud Infrastructure Created (AWS / Azure / GCP)
+        ↓
+State File Updated
+🧠 Simple Explanation
+
+Think of Terraform workflow like this:
+
+Write → describe what you want
+Init → prepare tools
+Plan → preview changes
+Apply → build infrastructure
+State → remember everything
+
+Terraform Modules:
+In Terraform (from HashiCorp), a module is a reusable container for a set of infrastructure resources. 
+It helps you organize, reuse, and manage your Terraform code efficiently.
+
+A module is simply a folder containing.tf files (resource definitions),input variables and output values
+
+Advantages of Modules
+ Reusability (write once, use many times)
+ Cleaner code structure
+ Easier team collaboration
+ Standardized infrastructure design
+ Faster deployment
+ 
+Disadvantages of Modules
+ Learning curve for beginners
+ Debugging can be harder in nested modules
+ Dependency complexity in large projects
+ Over-modularization can make projects harder to follow
+
+Types of Modules
+1. Root Module
+The main working directory where you run Terraform commands
+Every Terraform project has one root module
+
+2. Child Modules
+Reusable modules called inside the root module
+Can be local or from remote sources
+
+Example sources:
+
+Local directory
+GitHub
+Terraform Registry
+
+Why Use Modules?
+Modules help you:
+
+Avoid code duplication
+Improve reusability
+Organize large infrastructure projects
+Standardize environments (dev, test, prod)
+
+Modules Project Structure :
+
+project/
+│
+├── main.tf
+├── variables.tf
+├── outputs.tf
+│
+└── modules/
+    └── ec2/
+        ├── main.tf
+        ├── variables.tf
+        └── outputs.tf
+		
+How Modules Works:
+
+Root Module
+     ↓
+Calls Child Module
+     ↓
+Module creates resources
+     ↓
+Cloud Provider (AWS/Azure/GCP)
+     ↓
+Infrastructure is provisioned

@@ -585,3 +585,62 @@ terraform workspace show
 | staging   | pre-prod testing | t3.small      |
 | prod      | production       | t3.large      |
 
+State File in Terraform
+
+In Terraform (from HashiCorp), the state file (terraform.tfstate) is a JSON file that stores the real-world status of your infrastructure.
+The state file is Terraform’s memory of what it has created and is managing.
+
+What is a State File?
+
+The state file contains:
+
+All created resources
+Resource IDs (from cloud providers)
+Current configuration mapping
+Metadata about infrastructure dependencies
+
+Why State File is Important
+
+Terraform uses the state file to:
+
+✔ Track what exists in real infrastructure
+✔ Compare desired vs actual state
+✔ Decide what to create, update, or delete
+✔ Improve performance (no need to query cloud every time)
+
+How State File Works
+Terraform Code (.tf files)
+        ↓
+Terraform Apply
+        ↓
+Cloud Resources Created
+        ↓
+State File Updated (terraform.tfstate)
+        ↓
+Terraform uses it for future changes
+
+Risks of State File
+
+❌ Contains sensitive data (sometimes passwords, keys)
+❌ Can be corrupted if edited manually
+❌ Should NOT be committed to Git
+❌ Single file can become a bottleneck in teams
+
+Best Practices
+
+✔ Store state remotely (not locally)
+✔ Use backend like:
+
+S3 + DynamoDB (Amazon Web Services)
+Azure Blob Storage
+Terraform Cloud
+
+✔ Enable encryption
+✔ Enable state locking
+✔ Restrict access permissions
+
+| Type   | Description             | Risk            |
+| ------ | ----------------------- | --------------- |
+| Local  | Stored on your machine  | High risk       |
+| Remote | Stored in cloud backend | Safe & scalable |
+

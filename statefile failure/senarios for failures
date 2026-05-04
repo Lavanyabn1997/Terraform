@@ -1,0 +1,115 @@
+State Locking Failure Scenarios in Terraform
+
+In Terraform (from HashiCorp), state locking failures happen when Terraform is unable to acquire or release a lock on the state file properly. This can block deployments or even cause operational issues if not handled correctly.
+
+⚠️ 1. Lock Already Held (Most Common)
+📌 What happens
+
+Another Terraform process is already running and holding the lock.
+
+🧪 Example
+User A runs terraform apply
+User B runs terraform apply at the same time
+❌ Result
+
+User B gets error:
+
+Error: Error acquiring the state lock
+🧠 Why it happens
+Concurrent executions on same state
+⏱️ 2. Stale Lock (Forgotten Lock)
+📌 What happens
+
+A lock is created but never released due to crash or interruption.
+
+🧪 Example
+Terraform apply starts
+Terminal crashes / network failure
+Lock remains in backend
+❌ Result
+
+All future runs are blocked
+
+🛠️ Fix
+
+Manual unlock:
+
+terraform force-unlock <LOCK_ID>
+🌐 3. Backend Connectivity Failure
+📌 What happens
+
+Terraform cannot reach the backend storing the lock.
+
+Examples:
+
+Amazon Web Services S3 or DynamoDB outage
+Network issues
+IAM permission errors
+❌ Result
+
+Lock cannot be acquired or released
+
+🔐 4. Permission Denied for Locking
+📌 What happens
+
+User does not have permission to create or delete lock entries.
+
+🧪 Example
+Missing DynamoDB permissions in AWS backend
+❌ Result
+Error: AccessDeniedException
+🔄 5. Lock Not Released Properly
+📌 What happens
+
+Terraform finishes but fails to release lock due to unexpected failure.
+
+Causes
+Crash during apply
+Timeout
+API failure
+❌ Result
+
+State remains locked unnecessarily
+
+⚔️ 6. Parallel CI/CD Pipelines Conflict
+📌 What happens
+
+Multiple pipelines trigger Terraform at the same time.
+
+Example
+GitHub Actions deploy staging and prod simultaneously
+❌ Result
+
+Race condition → lock contention
+
+🧪 7. Corrupted Lock Metadata
+📌 What happens
+
+Lock data in backend becomes inconsistent.
+
+Causes
+Manual backend modification
+Partial writes
+Storage corruption
+🔁 Failure Flow
+Terraform Apply Start
+        ↓
+Try to acquire lock 🔒
+        ↓
+Failure occurs
+   ↙        ↘
+Lock held   Backend error / permission issue
+   ↓                  ↓
+Operation blocked     No lock created
+🛠️ How to Handle Lock Failures
+✔ 1. Identify lock ID
+
+Terraform shows lock ID in error
+
+✔ 2. Force unlock (careful)
+terraform force-unlock <LOCK_ID>
+✔ 3. Check backend health
+S3 / DynamoDB status
+Network connectivity
+✔ 4. Fix IAM permissions
+✔ 5. Avoid parallel runs in CI/CD

@@ -1025,11 +1025,21 @@ terraform destroy
 
 👉 Terraform will throw an error:
 
+
 Error: Resource cannot be destroyed
 ✅ Use Cases
 Production databases
 S3 buckets with important data
 Critical infrastructure
+
+| Argument              | Purpose           | Effect                       |
+| --------------------- | ----------------- | ---------------------------- |
+| create_before_destroy | Avoid downtime    | Replace safely               |
+| prevent_destroy       | Protect resource  | Blocks deletion              |
+| ignore_changes        | Ignore drift      | Prevents unnecessary updates |
+| replace_triggered_by  | Force replacement | Controlled recreation        |
+
+
 🔄 Manual vs Automated Changes
 🧑‍💻 Manual Changes
 📌 What it means

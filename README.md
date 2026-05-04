@@ -704,6 +704,58 @@ With State Locking
 ✔ Prevents accidental overwrites
 ✔ Maintains infrastructure consistency
 
+Remote State Locking vs Local State Locking in Terraform
+
+In Terraform (from HashiCorp), state locking prevents multiple operations from modifying the same state at the same time. This behaves differently depending on whether the state is local or remote.
+
+🗂️ 1. Local State Locking
+📌 What it is
+
+Local state locking happens when the state file is stored on your local machine.
+
+⚙️ How it works
+Terraform creates a lock file locally
+Example: .terraform.tfstate.lock.info
+Only one Terraform process can modify state at a time
+📍 Key Points
+
+✔ Works on single machine
+✔ Simple setup
+❌ Not reliable for teams
+❌ No strong concurrency control
+❌ No external coordination system
+
+🧪 Example
+User runs terraform apply
+      ↓
+Local state file locked
+      ↓
+Another process blocked locally
+☁️ 2. Remote State Locking
+📌 What it is
+
+Remote state locking happens when the state file is stored in a remote backend.
+
+Examples:
+
+Amazon Web Services S3 + DynamoDB
+Microsoft Azure Blob Storage
+Terraform Cloud
+⚙️ How it works
+Lock is created in a central system (not local machine)
+Example: DynamoDB table entry for lock
+Other users are blocked globally
+
+| Feature           | Local State Locking | Remote State Locking                 |
+| ----------------- | ------------------- | ------------------------------------ |
+| 📍 Location       | Local machine       | Cloud backend                        |
+| 🔒 Lock mechanism | Local file lock     | Central lock system (e.g., DynamoDB) |
+| 👥 Team support   | ❌ Not suitable      | ✅ Fully supported                    |
+| ⚙️ Scalability    | Low                 | High                                 |
+| 🛡️ Reliability   | Low                 | High                                 |
+| ☁️ Cloud usage    | None                | Required                             |
+
+
 🔄 Difference: State File vs State Locking vs Backend (Terraform)
 
 In Terraform (from HashiCorp), these three concepts work together to manage infrastructure safely, but they serve very different purposes.

@@ -644,3 +644,62 @@ Terraform Cloud
 | Local  | Stored on your machine  | High risk       |
 | Remote | Stored in cloud backend | Safe & scalable |
 
+
+State Locking in Terraform
+
+In Terraform (from HashiCorp), state locking is a mechanism that prevents multiple users or processes from modifying the same state file at the same time.
+State locking makes sure only one Terraform operation runs on a state file at a time.
+
+Why State Locking is Needed
+
+Terraform uses a state file (terraform.tfstate) to track infrastructure.
+
+Without locking:
+
+Two people run terraform apply simultaneously
+Both try to update the same state
+Result → conflicts or corrupted state
+
+How State Locking Works
+User A runs terraform apply
+        ↓
+State file gets LOCKED 🔒
+        ↓
+User B runs terraform apply → BLOCKED ⛔
+        ↓
+User A completes → LOCK RELEASED 🔓
+        ↓
+User B can proceed safely
+
+Where State Locking is Implemented
+
+State locking is not handled by Terraform core alone—it depends on the backend.
+
+✔ Common Backends with Locking
+Amazon Web Services S3 + DynamoDB
+Microsoft Azure Blob Storage
+Google Cloud Platform Cloud Storage
+Terraform Cloud
+
+How it works
+S3 bucket → stores the state file
+DynamoDB table → stores lock information
+
+ When terraform apply runs:
+
+Lock is created in DynamoDB
+Others are blocked until it is released
+
+Without State Locking
+
+❌ Multiple users modify state at once
+❌ Race conditions occur
+❌ Infrastructure becomes inconsistent
+❌ State file corruption risk
+
+With State Locking
+
+✔ One operation at a time
+✔ Safe collaboration in teams
+✔ Prevents accidental overwrites
+✔ Maintains infrastructure consistency

@@ -526,3 +526,62 @@ terraform apply -var="db_password=MySecurePass123"
 2️. Using Environment Variable (Best Practice)
 export TF_VAR_db_password="MySecurePass123"
 terraform apply
+
+
+Workspaces in Terraform
+
+In Terraform (from HashiCorp), workspaces allow you to manage multiple separate state files using the same configuration.
+Workspaces let you run the same Terraform code for different environments (like dev, test, prod) without duplicating code.
+
+A workspace = an isolated state environment
+
+Each workspace has its own:
+
+State file (terraform.tfstate)
+Resource tracking
+Infrastructure state
+
+Default Workspace - Terraform always starts with:default
+
+Limitations of Workspaces
+
+ Not ideal for large production systems
+ Can become confusing in complex setups
+ Limited isolation compared to separate backends
+ Same configuration code shared across environments
+
+Why Workspaces are Used
+
+Manage multiple environments
+Avoid duplicating code
+Separate state for dev / staging / prod
+Easy testing of infrastructure changes
+
+How Workspaces Work
+
+Same Terraform Code
+        ↓
+Multiple Workspaces
+        ↓
+Separate State Files
+        ↓
+Different Infrastructure Environments
+
+Workspace Commands:
+1️. List Workspaces
+terraform workspace list
+2️. Create a New Workspace
+terraform workspace new dev
+terraform workspace new prod
+3️. Switch Workspace
+terraform workspace select dev
+4️. Show Current Workspace
+terraform workspace show
+
+| Workspace | Purpose          | Instance Type |
+| --------- | ---------------- | ------------- |
+| default   | base testing     | t2.micro      |
+| dev       | development      | t2.micro      |
+| staging   | pre-prod testing | t3.small      |
+| prod      | production       | t3.large      |
+

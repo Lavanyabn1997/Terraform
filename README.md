@@ -71,7 +71,7 @@ EC2 instance
 Virtual network
 Database
 
-👉 This is the desired state
+This is the desired state
 
 2. Initialize Terraform
 terraform init
@@ -89,12 +89,13 @@ What happens:
 
 Compares current state vs desired state
 Creates an execution plan
+
 Shows:
 What will be created
 What will be changed
 What will be deleted
 
-👉 Safe preview step (no changes applied)
+Safe preview step (no changes applied)
 
 4. Apply the Changes
 terraform apply
@@ -116,7 +117,9 @@ What happens:
 
 Deletes all resources defined in configuration
 Cleans up infrastructure completely
-🔁 Terraform Workflow Diagram
+
+Terraform Workflow Diagram
+
 Write Code (.tf files)
         ↓
 terraform init
@@ -128,7 +131,8 @@ terraform apply
 Cloud Infrastructure Created (AWS / Azure / GCP)
         ↓
 State File Updated
-🧠 Simple Explanation
+
+Simple Explanation
 
 Think of Terraform workflow like this:
 
@@ -205,3 +209,59 @@ Module creates resources
 Cloud Provider (AWS/Azure/GCP)
      ↓
 Infrastructure is provisioned
+
+Terraform Variables
+n Terraform (from HashiCorp), variables are used to make your infrastructure code flexible and reusable.
+Instead of hardcoding values (like instance types, regions, or AMI IDs),
+you define variables and pass values dynamically.
+
+A variable is a placeholder for a value that can be passed into a Terraform configuration.It helps you avoid repeating or hardcoding values.
+
+Why Use Variables?
+
+Make code reusable
+Avoid hardcoding sensitive or changing values
+Support multiple environments (dev, test, prod)
+Improve readability and maintainability
+
+Types of Terraform Variables:
+
+1. Input Variables
+
+Used to pass values into Terraform configurations.
+
+2. Output Variables
+
+Used to display or export values after infrastructure is created.
+
+3. Local Variables
+
+Used for intermediate values inside configuration.
+
+Ways to Assign Variable Values
+
+1. Default Value (inside variable block)
+default = "t2.micro"
+2. Command Line
+terraform apply -var="instance_type=t2.small"
+3. Variable File (terraform.tfvars)
+instance_type = "t2.micro"
+4. Environment Variables
+export TF_VAR_instance_type=t2.micro
+
+Terraform Variable Types
+
+In Terraform (from HashiCorp), variables can have different data types. These types define what kind of value a variable can store.
+
+| Type   | Structure          | Example              | Use Case                 |
+| ------ | ------------------ | -------------------- | ------------------------ |
+| String | Single value       | `"t2.micro"`         | Names, IDs, regions      |
+| List   | Ordered collection | `["a", "b"]`         | Multiple values like AZs |
+| Map    | Key-value pairs    | `{Env="Dev"}`        | Tags, settings           |
+| Object | Structured data    | `{type, ami, count}` | Complex configs          |
+
+String → one label (“Mumbai”)
+List → a queue ( ["A", "B", "C"])
+Map → dictionary ( key → value pairs)
+Object → a full form with fields ( name, age, role together)
+

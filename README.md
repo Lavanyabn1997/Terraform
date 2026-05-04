@@ -774,3 +774,104 @@ State File Stored
 State Locking Activated During Apply
        ↓
 Infrastructure Updated Safely
+
+Infrastructure Drift & Drift Detection in Terraform
+
+In Terraform (from HashiCorp), drift happens when the real infrastructure in the cloud is different from what is defined in your Terraform code or stored in the state file.
+
+Drift :
+Drift = mismatch between desired state and actual infrastructure state
+
+Example
+
+You define in Terraform:
+
+instance_type = "t2.micro"
+
+But someone manually changes it in Amazon Web Services console to:
+
+t2.large
+
+Now infrastructure ≠ Terraform code → this is drift
+
+Causes of Drift
+
+Drift happens when changes are made outside Terraform:
+
+Manual changes in cloud console
+Scripts or automation tools (not Terraform)
+Auto-scaling changes
+Admin modifications
+
+Drift detection:
+
+It is the process of identifying differences between Terraform state and real infrastructure.
+
+How Terraform Detects Drift:
+
+Terraform Code (Desired State)
+          ↓
+Terraform State File
+          ↓
+Real Cloud Infrastructure
+          ↓
+Difference Found? → Drift detected
+
+Command for Drift Detection
+
+1️ Refresh state
+terraform refresh
+
+Updates state file with real infrastructure values
+
+2️ Plan (Most common method)
+terraform plan
+
+Shows:
+
+Changes made outside Terraform
+Differences between state and real infrastructure
+
+📊 Example Output (Concept)
+~ instance_type: "t2.micro" => "t2.large"
+
+👉 Terraform detected drift
+
+🔁 How Drift is Fixed
+Option 1: Accept drift
+terraform apply
+
+👉 Terraform updates state to match real infra
+
+Option 2: Revert drift
+Manually change infrastructure back
+Or let Terraform overwrite it
+
+🧠 Types of Drift
+1️⃣ Configuration Drift
+Infrastructure manually changed
+Example: instance type changed in console
+2️⃣ State Drift
+State file not matching actual infrastructure
+🛡️ How to Prevent Drift
+
+✔ Avoid manual changes in cloud console
+✔ Use Terraform for all updates
+✔ Use CI/CD pipelines
+✔ Enable access controls in Amazon Web Services
+✔ Regular terraform plan checks
+
+🔁 Drift Detection Workflow
+Terraform Code
+      ↓
+terraform plan / refresh
+      ↓
+Compare with Cloud Infra
+      ↓
+Drift Found?
+   ↙        ↘
+ No         Yes
+ ↓           ↓
+Continue   Show differences
+            ↓
+        terraform apply

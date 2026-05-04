@@ -265,3 +265,88 @@ List → a queue ( ["A", "B", "C"])
 Map → dictionary ( key → value pairs)
 Object → a full form with fields ( name, age, role together)
 
+Expressions and Functions in Terraform
+
+In Terraform (from HashiCorp), expressions and functions are used to compute values dynamically instead of hardcoding them. 
+They make your Infrastructure as Code flexible and powerful.
+
+What are Expressions?
+
+An expression is anything that produces a value.It can be:
+A variable reference
+A math operation
+A condition
+A function call
+
+Types of Expressions
+
+1.1 Basic Expressions - Refers to a variable value.
+var.instance_type
+
+
+1.2 Arithmetic Expressions - Used for calculations.
+2 + 3
+10 * 5
+
+
+1.3 Conditional Expressions - If environment is prod → large instance, else small.
+var.env == "prod" ? "large" : "small"
+
+ 
+1.4 Interpolation Expressions - Creates dynamic strings.
+"server-${var.env}"
+
+
+Functions in Terraform
+
+What are Functions?
+
+A function is a built-in operation that transforms or computes values.
+
+Syntax:
+
+function_name(argument1, argument2)
+
+Common Terraform Functions
+2.1 length() - Returns number of elements.
+
+length(["a", "b", "c"])
+
+Output: 3
+
+2.2 upper() / lower() - Converts text case.
+
+upper("terraform")
+
+Output: "TERRAFORM"
+
+2.3 join() - Combines list into string.
+
+join("-", ["dev", "app", "server"])
+
+Output: "dev-app-server"
+
+2.4 split() - Splits string into list.
+
+split("-", "dev-app-server")
+
+Output: ["dev", "app", "server"]
+
+2.5 lookup() - Gets value from a map.
+
+lookup({env = "dev", size = "t2.micro"}, "env")
+
+Output: "dev"
+
+2.6 merge() - Combines multiple maps.
+
+merge({a = 1}, {b = 2})
+
+Output: {a = 1, b = 2}
+
+2.7 element() - Fetches item from list by index.
+
+element(["a", "b", "c"], 1)
+
+Output: "b"
+

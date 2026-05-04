@@ -142,6 +142,40 @@ Plan → preview changes
 Apply → build infrastructure
 State → remember everything
 
+Providers and Resources in Terraform
+
+In Terraform (from HashiCorp), providers and resources are the two most important building blocks. 
+They define where infrastructure is created and what is created.
+
+Providers in Terraform
+
+A provider is a plugin that allows Terraform to interact with an external platform (cloud or service).
+It acts as a bridge between Terraform and cloud platforms.
+
+What Provider Does:
+A provider Connects Terraform to a cloud or service,Exposes APIs as resources,Handles authentication,Manages lifecycle of infrastructure
+
+Without a provider, Terraform cannot create anything.
+
+Resources in Terraform
+A resource is a component of infrastructure that Terraform manages.It is the actual object created in the cloud.
+Eg:
+Virtual machine
+Database
+Network
+Storage bucket
+
+Provider = where to create
+Resource = what to create
+
+| Feature  | Provider                         | Resource                     |
+| -------- | -------------------------------- | ---------------------------- |
+| Meaning  | Connects Terraform to a platform | Actual infrastructure object |
+| Role     | Bridge / API connector           | Real cloud object            |
+| Example  | AWS, Azure, GCP                  | EC2, VM, S3 bucket           |
+| Quantity | Usually few per project          | Many resources per project   |
+
+
 Terraform Modules:
 In Terraform (from HashiCorp), a module is a reusable container for a set of infrastructure resources. 
 It helps you organize, reuse, and manage your Terraform code efficiently.

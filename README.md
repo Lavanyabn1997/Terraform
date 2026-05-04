@@ -927,3 +927,292 @@ Drift Found?
 Continue   Show differences
             ↓
         terraform apply
+
+
+Data Sources in Terraform
+
+In Terraform (from HashiCorp), data sources are used to fetch and read existing information from infrastructure without creating or managing it.
+Data sources let Terraform “look up” existing resources instead of creating new ones.
+
+data "<provider>_<type>" "<name>" {
+  # arguments
+}
+
+A data source is a read-only component that pulls information from:
+
+Cloud providers
+Existing infrastructure
+External services
+
+It is used when resources already exist in the cloud.
+
+Example Use Case
+
+In Amazon Web Services:
+
+You already have an AMI (machine image)
+You want Terraform to find it automatically
+
+Instead of hardcoding AMI ID, you use a data source
+
+Key Characteristics
+
+✔ Read-only (does NOT create resources)
+✔ Fetches existing infrastructure data
+✔ Helps avoid hardcoding values
+✔ Works with providers
+
+| Feature | Resource               | Data Source                   |
+| ------- | ---------------------- | ----------------------------- |
+| Action  | Creates infrastructure | Reads existing infrastructure |
+| State   | Managed by Terraform   | Not created, only referenced  |
+| Example | EC2 instance           | AMI lookup                    |
+| Keyword | `resource`             | `data`                        |
+
+
+Terraform Resource Lifecycle Rules
+
+In Terraform (from HashiCorp), lifecycle rules control how Terraform creates, updates, and deletes resources safely.
+
+They are defined inside a resource block using lifecycle.
+
+⚙️ 1. create_before_destroy
+📌 What it does
+
+Terraform creates a new resource before destroying the old one.
+
+🧪 Example
+resource "aws_instance" "web" {
+  ami           = "ami-123456"
+  instance_type = "t2.micro"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+🔁 How it works
+Old Resource (Running)
+        ↓
+New Resource Created First
+        ↓
+Traffic Switches
+        ↓
+Old Resource Destroyed
+✅ Use Cases
+Zero downtime deployments
+Replacing instances safely
+Production environments in Amazon Web Services
+❌ Without it
+Old resource destroyed first → downtime risk
+🛑 2. prevent_destroy
+📌 What it does
+
+Prevents Terraform from deleting a resource accidentally.
+
+🧪 Example
+resource "aws_s3_bucket" "data" {
+  bucket = "my-important-bucket"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+⚠️ What happens
+
+If someone runs:
+
+terraform destroy
+
+👉 Terraform will throw an error:
+
+Error: Resource cannot be destroyed
+✅ Use Cases
+Production databases
+S3 buckets with important data
+Critical infrastructure
+🔄 Manual vs Automated Changes
+🧑‍💻 Manual Changes
+📌 What it means
+
+Changes made directly in cloud console (not Terraform)
+
+Example:
+
+Editing EC2 instance manually
+Changing S3 bucket settings manually
+❌ Problems
+Causes drift
+Not tracked in state file
+Can break Terraform consistency
+
+🤖 Automated Changes (Best Practice)
+📌 What it means
+
+All changes done via Terraform code
+
+✅ Benefits
+
+Consistent infrastructure
+Version-controlled
+Repeatable deployments
+No drift issues
+
+| Feature       | Manual Changes      | Automated (Terraform) |
+| ------------- | ------------------- | --------------------- |
+| Control       | Human console edits | Code-driven           |
+| Tracking      | Not tracked         | Tracked in state      |
+| Risk          | High (drift)        | Low                   |
+| Consistency   | Unreliable          | Reliable              |
+| Best practice | ❌ Avoid            | ✅ Recommended       |
+
+
+
+Advanced Terraform Concepts (Meta-arguments & Related Features)
+
+In Terraform (from HashiCorp), these features help you control how resources are created, repeated, ordered, and managed in real infrastructure.
+
+🔁 1. count (Meta-argument)
+📌 What it does
+
+Creates multiple identical resources.
+
+🧪 Example
+resource "aws_instance" "web" {
+  count         = 3
+  ami           = "ami-123456"
+  instance_type = "t2.micro"
+}
+
+👉 Creates 3 EC2 instances in Amazon Web Services
+
+🧠 Use Case
+Scaling identical servers
+Creating multiple environments quickly
+🔁 2. for_each (Better than count)
+📌 What it does
+
+Creates resources based on a map or set of values.
+
+🧪 Example
+resource "aws_iam_user" "users" {
+  for_each = toset(["dev", "test", "prod"])
+  name     = each.key
+}
+🧠 Key Difference
+count	for_each
+index-based	key-based
+less flexible	more flexible
+🔗 3. depends_on
+📌 What it does
+
+Forces Terraform to create resources in a specific order.
+
+🧪 Example
+resource "aws_instance" "web" {
+  ami = "ami-123456"
+
+  depends_on = [aws_s3_bucket.data]
+}
+🧠 Use Case
+When Terraform cannot automatically detect dependency
+Ensuring proper resource sequencing
+🧱 4. Dynamic Blocks
+📌 What it does
+
+Creates repeating nested blocks dynamically.
+
+🧪 Example
+resource "aws_security_group" "sg" {
+  name = "example"
+
+  dynamic "ingress" {
+    for_each = var.ports
+    content {
+      from_port = ingress.value
+      to_port   = ingress.value
+      protocol  = "tcp"
+    }
+  }
+}
+🧠 Use Case
+Dynamic firewall rules
+Flexible configurations
+💥 5. Tainting Resources
+📌 What it does
+
+Marks a resource for recreation during next apply.
+
+🧪 Command
+terraform taint aws_instance.web
+🔁 Result
+Resource is destroyed and recreated
+🧠 Use Case
+Fix broken infrastructure
+Force replacement of unhealthy resource
+📥 6. Import Existing Infrastructure
+📌 What it does
+
+Brings existing cloud resources under Terraform management.
+
+🧪 Command
+terraform import aws_instance.web i-1234567890
+
+(Example in Amazon Web Services)
+
+⚠️ Important
+Does NOT create code automatically
+You must write matching .tf configuration manually
+🔄 7. Refresh & Drift Detection
+📌 What it does
+
+Updates Terraform state with real-world infrastructure changes.
+
+🧪 Command
+terraform refresh
+
+Or:
+
+terraform plan
+
+🔍 Purpose
+Detects drift
+Syncs state file with actual infrastructure
+
+🧠 Example
+
+If someone changes instance type manually:
+
+Terraform detects difference on next plan
+
+📊 Summary Table
+Feature	Purpose
+count	Create multiple identical resources
+for_each	Create resources from map/set
+depends_on	Force resource order
+Dynamic blocks	Generate nested blocks dynamically
+Taint	Force recreation of resource
+Import	Bring existing infra into Terraform
+Refresh	Sync state with real infrastructure
+
+🔁 How They Work Together
+Terraform Code
+      ↓
+Meta-arguments (count / for_each / depends_on)
+      ↓
+Resource Creation
+      ↓
+State File Updated
+      ↓
+Refresh detects drift
+      ↓
+Import brings external infra under control
+
+🧠 Simple Analogy
+count → copy-paste resources 📋
+for_each → smart looping with names 🧠
+depends_on → task ordering ⏳
+dynamic blocks → auto-generated forms 🧾
+taint → “rebuild this” label 🔧
+import → adopt existing house 🏠
+refresh → reality check 🪞
+

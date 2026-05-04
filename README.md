@@ -432,3 +432,97 @@ Infrastructure Created (AWS/Azure/GCP)
 Provisioner Executes
        ↓
 Scripts / Commands Run
+
+Secrets and Sensitive Data in Terraform
+
+In Terraform (from HashiCorp), secrets and sensitive data refer to information like passwords, API keys, tokens, and database credentials 
+that must be protected from being exposed in code, logs, or state files.
+
+What are Secrets?
+
+Secrets are highly sensitive values such as:
+
+API keys
+Database passwords
+SSH private keys
+Access tokens
+
+Example: AWS secret access key from Amazon Web Services
+
+Why Sensitive Data is a Risk
+
+If not handled properly, secrets can:
+
+Be exposed in Terraform logs
+Be stored in state files (terraform.tfstate)
+Leak into version control (GitHub)
+
+Terraform does NOT automatically encrypt state files unless configured with remote backends.
+
+ How Terraform Handles Sensitive Data
+1️.sensitive Argument (Outputs)
+
+You can mark outputs as sensitive:
+
+output "db_password" {
+  value     = var.db_password
+  sensitive = true
+}
+
+Terraform will hide it in CLI output.
+
+2️ Sensitive Variables
+
+You can mark variables as sensitive:
+
+variable "db_password" {
+  type      = string
+  sensitive = true
+}
+3️. Environment Variables (Safer Option)
+
+Instead of hardcoding:
+
+export TF_VAR_db_password="mypassword123"
+
+Terraform reads it securely at runtime.
+
+4️. terraform.tfvars (Risky if not protected)
+db_password = "mypassword123"
+
+Should NOT be committed to Git without encryption.
+
+5️. State File Protection (Very Important)
+
+Terraform stores secrets in the state file, so:
+
+Best practice:
+
+Use remote backend storage
+
+Enable encryption (e.g., S3 + encryption in AWS)
+Example with AWS RDS
+resource "aws_db_instance" "db" {
+  username = "admin"
+  password = var.db_password
+}
+
+Password is marked sensitive and should never be printed.
+
+ Flow of Sensitive Data
+ 
+Input (Variable / Env / Secret Manager)
+          ↓
+Terraform Execution
+          ↓
+State File (Sensitive Data Stored)
+          ↓
+Output (Masked if sensitive=true)
+
+How to Provide the Password (Safe Ways)
+
+1️. Using CLI
+terraform apply -var="db_password=MySecurePass123"
+2️. Using Environment Variable (Best Practice)
+export TF_VAR_db_password="MySecurePass123"
+terraform apply

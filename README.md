@@ -384,3 +384,51 @@ element(["a", "b", "c"], 1)
 
 Output: "b"
 
+
+Provisioners in Terraform
+In Terraform (from HashiCorp), provisioners are used to run scripts or commands on a local or remote machine after a resource is created or destroyed.
+Provisioners help you perform post-creation configuration tasks.
+
+Why Provisioners are Used
+
+Terraform mainly creates infrastructure, but sometimes you also need to:
+
+Install software on servers
+Copy files to virtual machines
+Run setup scripts after provisioning
+
+Provisioners handle these extra tasks.
+
+Types of Provisioners
+
+1. file Provisioner - Used to copy files from local system to remote server.
+
+provisioner "file" {
+  source      = "app.sh"
+  destination = "/home/ec2-user/app.sh"
+}
+
+2. remote-exec Provisioner - Used to run commands on a remote machine (like EC2).
+
+provisioner "remote-exec" {
+  inline = [
+    "sudo apt update",
+    "sudo apt install -y nginx"
+  ]
+}
+
+3. local-exec Provisioner - Used to run commands on your local machine.
+
+provisioner "local-exec" {
+  command = "echo 'Server created successfully'"
+}
+
+How Provisioners Work
+
+Terraform Apply
+       ↓
+Infrastructure Created (AWS/Azure/GCP)
+       ↓
+Provisioner Executes
+       ↓
+Scripts / Commands Run
